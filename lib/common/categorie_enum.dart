@@ -1,0 +1,1 @@
+enum CategorieEnum { Tv, Movie }
