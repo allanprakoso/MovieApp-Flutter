@@ -1,14 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
-import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/movie.dart';
+import 'package:ditonton/presentation/bloc/movie_list/movie_list_bloc.dart';
 import 'package:ditonton/presentation/pages/movie_detail_page.dart';
 import 'package:ditonton/presentation/pages/popular_movies_page.dart';
 import 'package:ditonton/presentation/pages/top_rated_movies_page.dart';
-import 'package:ditonton/presentation/provider/movie_list_notifier.dart';
 import 'package:ditonton/presentation/widgets/build_sub_heading.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MoviePage extends StatefulWidget {
   @override
@@ -19,78 +18,76 @@ class _MoviePageState extends State<MoviePage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => Provider.of<MovieListNotifier>(context, listen: false)
-          ..fetchNowPlayingMovies()
-          ..fetchPopularMovies()
-          ..fetchTopRatedMovies());
+    BlocProvider.of<MovieListBloc>(context).add(FetchMovieListEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Movies',
-            style: kHeading5,
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Text(
-            'Now Playing',
-            style: kHeading6,
-          ),
-          Consumer<MovieListNotifier>(builder: (context, data, child) {
-            final state = data.nowPlayingState;
-            if (state == RequestState.Loading) {
+    final MovieListBloc movieListBloc = BlocProvider.of<MovieListBloc>(context);
+    return Center(
+      child: SingleChildScrollView(
+        child: BlocBuilder<MovieListBloc, MovieListState>(
+          builder: (context, state) {
+            if (state is MovieListLoading) {
               return Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (state == RequestState.Loaded) {
-              return MovieList(data.nowPlayingMovies);
-            } else {
-              return Text('Failed');
             }
-          }),
-          BuildSubHeading(
-            title: 'Popular',
-            onTap: () =>
-                Navigator.pushNamed(context, PopularMoviesPage.ROUTE_NAME),
-          ),
-          Consumer<MovieListNotifier>(builder: (context, data, child) {
-            final state = data.popularMoviesState;
-            if (state == RequestState.Loading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state == RequestState.Loaded) {
-              return MovieList(data.popularMovies);
+            if (state is MovieListLoaded) {
+              return Content(
+                  nowPlayingMovies: state.nowPlayingMovies,
+                  popularMovies: state.popularMovies,
+                  topRatedMovies: state.topRatedMovies);
             } else {
-              return Text('Failed');
+              return Text('Failed Load Data');
             }
-          }),
-          BuildSubHeading(
-            title: 'Top Rated',
-            onTap: () =>
-                Navigator.pushNamed(context, TopRatedMoviesPage.ROUTE_NAME),
-          ),
-          Consumer<MovieListNotifier>(builder: (context, data, child) {
-            final state = data.topRatedMoviesState;
-            if (state == RequestState.Loading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state == RequestState.Loaded) {
-              return MovieList(data.topRatedMovies);
-            } else {
-              return Text('Failed');
-            }
-          }),
-        ],
+          },
+        ),
       ),
+    );
+  }
+}
+
+class Content extends StatelessWidget {
+  final List<Movie> nowPlayingMovies;
+  final List<Movie> popularMovies;
+  final List<Movie> topRatedMovies;
+
+  const Content(
+      {required this.nowPlayingMovies,
+      required this.popularMovies,
+      required this.topRatedMovies});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Movies',
+          style: kHeading5,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Text(
+          'Now Playing',
+          style: kHeading6,
+        ),
+        MovieList(nowPlayingMovies),
+        BuildSubHeading(
+          title: 'Popular',
+          onTap: () =>
+              Navigator.pushNamed(context, PopularMoviesPage.ROUTE_NAME),
+        ),
+        MovieList(popularMovies),
+        BuildSubHeading(
+          title: 'Top Rated',
+          onTap: () =>
+              Navigator.pushNamed(context, TopRatedMoviesPage.ROUTE_NAME),
+        ),
+        MovieList(topRatedMovies)
+      ],
     );
   }
 }
