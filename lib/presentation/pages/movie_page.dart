@@ -23,7 +23,6 @@ class _MoviePageState extends State<MoviePage> {
 
   @override
   Widget build(BuildContext context) {
-    final MovieListBloc movieListBloc = BlocProvider.of<MovieListBloc>(context);
     return Center(
       child: SingleChildScrollView(
         child: BlocBuilder<MovieListBloc, MovieListState>(

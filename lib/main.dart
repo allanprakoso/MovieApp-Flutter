@@ -1,5 +1,10 @@
 import 'package:ditonton/common/constants.dart';
+import 'package:ditonton/presentation/bloc/movie_detail/movie_detail_bloc.dart';
 import 'package:ditonton/presentation/bloc/movie_list/movie_list_bloc.dart';
+import 'package:ditonton/presentation/bloc/movie_serach/movie_search_bloc.dart';
+import 'package:ditonton/presentation/bloc/movie_watchlist/movie_watchlist_bloc.dart';
+import 'package:ditonton/presentation/bloc/popular_movies/popular_movies_bloc.dart';
+import 'package:ditonton/presentation/bloc/top_rated_movies/top_rated_movies_bloc.dart';
 import 'package:ditonton/presentation/pages/about_page.dart';
 import 'package:ditonton/presentation/pages/movie_detail_page.dart';
 import 'package:ditonton/presentation/pages/home_page.dart';
@@ -72,17 +77,31 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MultiBlocProvider(
-        providers:[
+        providers: [
           BlocProvider(
             create: (_) => di.locator<MovieListBloc>(),
-          )
+          ),
+          BlocProvider(
+            create: (_) => di.locator<MovieDetailBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => di.locator<PopularMoviesBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => di.locator<TopRatedMoviesBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => di.locator<MovieSearchBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => di.locator<MovieWatchlistBloc>(),
+          ),
         ],
         child: MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData.dark().copyWith(
             colorScheme: kColorScheme,
             primaryColor: kRichBlack,
-            accentColor: kMikadoYellow,
             scaffoldBackgroundColor: kRichBlack,
             textTheme: kTextTheme,
           ),
