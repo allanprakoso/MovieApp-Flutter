@@ -10,7 +10,7 @@ class MovieWatchlistBloc
     extends Bloc<MovieWatchlistEvent, MovieWatchlistState> {
   final GetWatchlistMovies getWatchlistMovies;
   MovieWatchlistBloc(this.getWatchlistMovies) : super(MovieWatchlistInitial()) {
-    on<MovieWatchlistEvent>((event, emit) async {
+    on<FetchMovieWatchlistEvent>((event, emit) async {
       emit(MovieWatchlistLoading());
       final result = await getWatchlistMovies.execute();
 

@@ -6,3 +6,5 @@ abstract class MovieWatchlistEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class FetchMovieWatchlistEvent extends MovieWatchlistEvent {}

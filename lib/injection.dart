@@ -80,13 +80,17 @@ void init() {
       locator(),
     ),
   );
-  locator.registerFactory(() => MovieSearchBloc(
-        locator(),
-      ));
+  locator.registerFactory(
+    () => MovieSearchBloc(
+      locator(),
+    ),
+  );
 
-  locator.registerFactory(() => MovieWatchlistBloc(
-        locator(),
-      ));
+  locator.registerFactory(
+    () => MovieWatchlistBloc(
+      locator(),
+    ),
+  );
   // provider
   locator.registerFactory(
     () => MovieListNotifier(

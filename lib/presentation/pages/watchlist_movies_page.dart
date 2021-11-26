@@ -1,8 +1,8 @@
-import 'package:ditonton/common/state_enum.dart';
+import 'package:ditonton/presentation/bloc/movie_watchlist/movie_watchlist_bloc.dart';
 import 'package:ditonton/presentation/provider/watchlist_movie_notifier.dart';
 import 'package:ditonton/presentation/widgets/movie_card_list.dart';
-import 'package:ditonton/presentation/widgets/tv_card_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 class WatchlistMoviesPage extends StatefulWidget {
@@ -17,10 +17,14 @@ class _WatchlistMoviesPageState extends State<WatchlistMoviesPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => Provider.of<WatchlistMovieNotifier>(context, listen: false)
-          ..fetchWatchlistMovies()
-          ..fetchWatchlistTvs());
+    if (categorie == 'Movie') {
+      BlocProvider.of<MovieWatchlistBloc>(context)
+          .add(FetchMovieWatchlistEvent());
+    } else {
+      Future.microtask(() =>
+          Provider.of<WatchlistMovieNotifier>(context, listen: false)
+            ..fetchWatchlistTvs());
+    }
   }
 
   @override
@@ -54,30 +58,24 @@ class _WatchlistMoviesPageState extends State<WatchlistMoviesPage> {
             ),
             Expanded(
               child: Container(
-                child: Consumer<WatchlistMovieNotifier>(
-                  builder: (context, data, child) {
-                    if (data.watchlistState == RequestState.Loading) {
+                child: BlocBuilder<MovieWatchlistBloc, MovieWatchlistState>(
+                  builder: (context, state) {
+                    if (state is MovieWatchlistLoading) {
                       return Center(
                         child: CircularProgressIndicator(),
                       );
-                    } else if (data.watchlistState == RequestState.Loaded) {
+                    } else if (state is MovieWatchlistLoaded) {
                       return ListView.builder(
                         itemBuilder: (context, index) {
-                          if (categorie == 'Movie') {
-                            final movie = data.watchlistMovies[index];
-                            return MovieCard(movie);
-                          }
-                          final movie = data.watchlistTvs[index];
-                          return TvCard(movie);
+                          final movie = state.movies[index];
+                          return MovieCard(movie);
                         },
-                        itemCount: (categorie == 'Movie')
-                            ? data.watchlistMovies.length
-                            : data.watchlistTvs.length,
+                        itemCount: state.movies.length,
                       );
                     } else {
                       return Center(
                         key: Key('error_message'),
-                        child: Text(data.message),
+                        child: Text(state.message),
                       );
                     }
                   },
