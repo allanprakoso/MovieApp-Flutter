@@ -1,3 +1,4 @@
+import 'package:ditonton/common/ssl.dart';
 import 'package:ditonton/data/datasources/db/database_helper.dart';
 import 'package:ditonton/data/datasources/movie_local_data_source.dart';
 import 'package:ditonton/data/datasources/movie_remote_data_source.dart';
@@ -40,13 +41,15 @@ import 'package:ditonton/presentation/bloc/tv_serach/tv_search_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_watchlist/tv_watchlist_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_it/get_it.dart';
+import 'package:http/io_client.dart';
 
 import 'data/datasources/tv_local_data_source.dart';
 
 final locator = GetIt.instance;
 
-void init() {
+Future<void> init() async {
   //? bloc movie
+
   locator.registerFactory(
     () => MovieListBloc(
       getNowPlayingMovies: locator(),
@@ -177,5 +180,6 @@ void init() {
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
 
   // external
-  locator.registerLazySingleton(() => http.Client());
+  IOClient client = await SSLHelper.ioClient;
+  locator.registerLazySingleton(() => client);
 }
