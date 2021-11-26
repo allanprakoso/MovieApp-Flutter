@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "964749122668",
+    "project_id": "ditonton-movieapp",
+    "storage_bucket": "ditonton-movieapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964749122668:android:af1d420c46d749e7848c49",
+        "android_client_info": {
+          "package_name": "com.lan.ditonton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964749122668-uugv0neh9oonrtp6vmg5se7ljumnt80b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCM6iEl1oWJLM2lJtuyL9WFvW3IkaDNZpo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964749122668-uugv0neh9oonrtp6vmg5se7ljumnt80b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

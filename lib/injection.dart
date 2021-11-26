@@ -39,7 +39,6 @@ import 'package:ditonton/presentation/bloc/tv_detail/tv_detail_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_list/tv_list_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_serach/tv_search_bloc.dart';
 import 'package:ditonton/presentation/bloc/tv_watchlist/tv_watchlist_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:get_it/get_it.dart';
 import 'package:http/io_client.dart';
 
