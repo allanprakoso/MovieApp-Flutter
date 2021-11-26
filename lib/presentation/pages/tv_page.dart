@@ -1,14 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
-import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/domain/entities/tv.dart';
+import 'package:ditonton/presentation/bloc/tv_list/tv_list_bloc.dart';
 import 'package:ditonton/presentation/pages/popular_tvs_page.dart';
 import 'package:ditonton/presentation/pages/top_rated_tvs_page.dart';
 import 'package:ditonton/presentation/pages/tv_detail_page.dart';
-import 'package:ditonton/presentation/provider/tv_list_notifier.dart';
 import 'package:ditonton/presentation/widgets/build_sub_heading.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TvPage extends StatefulWidget {
   @override
@@ -19,77 +18,73 @@ class _TvPageState extends State<TvPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => Provider.of<TvListNotifier>(context, listen: false)
-      ..fetchNowPlayingTvs()
-      ..fetchPopularTvs()
-      ..fetchTopRatedTvs());
+    BlocProvider.of<TvListBloc>(context).add(FetchTvListEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Tv Series',
-            style: kHeading5,
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Text(
-            'Now Playing',
-            style: kHeading6,
-          ),
-          Consumer<TvListNotifier>(builder: (context, data, child) {
-            final state = data.nowPlayingState;
-            if (state == RequestState.Loading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state == RequestState.Loaded) {
-              return TvList(data.nowPlayingTvs);
-            } else {
-              return Text('Failed');
-            }
-          }),
-          BuildSubHeading(
-            title: 'Popular',
-            onTap: () =>
-                Navigator.pushNamed(context, PopularTvsPage.ROUTE_NAME),
-          ),
-          Consumer<TvListNotifier>(builder: (context, data, child) {
-            final state = data.popularTvsState;
-            if (state == RequestState.Loading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state == RequestState.Loaded) {
-              return TvList(data.popularTvs);
-            } else {
-              return Text('Failed');
-            }
-          }),
-          BuildSubHeading(
-            title: 'Top Rated',
-            onTap: () =>
-                Navigator.pushNamed(context, TopRatedTvsPage.ROUTE_NAME),
-          ),
-          Consumer<TvListNotifier>(builder: (context, data, child) {
-            final state = data.topRatedTvsState;
-            if (state == RequestState.Loading) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state == RequestState.Loaded) {
-              return TvList(data.topRatedTvs);
-            } else {
-              return Text('Failed');
-            }
-          }),
-        ],
-      ),
+    return Center(
+      child: SingleChildScrollView(child: BlocBuilder<TvListBloc, TvListState>(
+        builder: (context, state) {
+          if (state is TvListLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is TvListLoaded) {
+            return Content(
+              nowPlayingTvs: state.nowPlayingTvs,
+              popularTvs: state.popularTvs,
+              topRatedTvs: state.topRatedTvs,
+            );
+          }
+          return Center(
+            child: Text(state.message),
+          );
+        },
+      )),
+    );
+  }
+}
+
+class Content extends StatelessWidget {
+  final List<Tv> nowPlayingTvs;
+  final List<Tv> popularTvs;
+  final List<Tv> topRatedTvs;
+
+  const Content(
+      {required this.nowPlayingTvs,
+      required this.popularTvs,
+      required this.topRatedTvs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tvs',
+          style: kHeading5,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Text(
+          'Now Playing',
+          style: kHeading6,
+        ),
+        TvList(nowPlayingTvs),
+        BuildSubHeading(
+          title: 'Popular',
+          onTap: () => Navigator.pushNamed(context, PopularTvsPage.ROUTE_NAME),
+        ),
+        TvList(popularTvs),
+        BuildSubHeading(
+          title: 'Top Rated',
+          onTap: () => Navigator.pushNamed(context, TopRatedTvsPage.ROUTE_NAME),
+        ),
+        TvList(topRatedTvs)
+      ],
     );
   }
 }

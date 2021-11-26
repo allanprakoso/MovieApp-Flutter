@@ -17,14 +17,15 @@ class MovieDetailLoading extends MovieDetailState {}
 class MovieDetailLoaded extends MovieDetailState {
   final MovieDetail movie;
   final List<Movie> movieRecommendations;
-  
 
   MovieDetailLoaded({
     required this.movie,
     required this.movieRecommendations,
     required bool isAddedToWatchlist,
-    String watchlistMessage='',
-  }) : super(isAddedToWatchlist: isAddedToWatchlist, watchlistMessage: watchlistMessage);
+    String watchlistMessage = '',
+  }) : super(
+            isAddedToWatchlist: isAddedToWatchlist,
+            watchlistMessage: watchlistMessage);
 
   @override
   List<Object> get props => [movie, isAddedToWatchlist, movieRecommendations];

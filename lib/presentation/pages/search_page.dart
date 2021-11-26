@@ -1,13 +1,11 @@
 import 'package:ditonton/common/categorie_enum.dart';
 import 'package:ditonton/common/constants.dart';
-import 'package:ditonton/common/state_enum.dart';
 import 'package:ditonton/presentation/bloc/movie_serach/movie_search_bloc.dart';
-import 'package:ditonton/presentation/provider/tv_search_notifier.dart';
+import 'package:ditonton/presentation/bloc/tv_serach/tv_search_bloc.dart';
 import 'package:ditonton/presentation/widgets/movie_card_list.dart';
 import 'package:ditonton/presentation/widgets/tv_card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 class SearchPage extends StatelessWidget {
   static const ROUTE_NAME = '/search';
@@ -28,11 +26,11 @@ class SearchPage extends StatelessWidget {
             TextField(
               onSubmitted: (query) {
                 if (categorie == CategorieEnum.Movie) {
-                  BlocProvider.of<MovieSearchBloc>(context, listen: false)
+                  BlocProvider.of<MovieSearchBloc>(context)
                       .add(SearchMoviesEvent(query));
                 } else {
-                  Provider.of<TvSearchNotifier>(context, listen: false)
-                      .fetchTvSearch(query);
+                  BlocProvider.of<TvSearchBloc>(context)
+                      .add(SearchTvsEvent(query));
                 }
               },
               decoration: InputDecoration(
@@ -50,7 +48,7 @@ class SearchPage extends StatelessWidget {
             Container(
                 child: (categorie == CategorieEnum.Movie)
                     ? BuilderMovie()
-                    : TvConsumer(categorie: categorie)),
+                    : BuilderTv()),
           ],
         ),
       ),
@@ -58,30 +56,24 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class TvConsumer extends StatelessWidget {
-  const TvConsumer({
-    Key? key,
-    required this.categorie,
-  }) : super(key: key);
-
-  final categorie;
+class BuilderTv extends StatelessWidget {
+  const BuilderTv();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TvSearchNotifier>(
-      builder: (context, dataTv, child) {
-        if (dataTv.state == RequestState.Loading) {
+    return BlocBuilder<TvSearchBloc, TvSearchState>(
+      builder: (context, state) {
+        if (state is TvSearchLoading) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (dataTv.state == RequestState.Loaded &&
-            categorie == CategorieEnum.Tv) {
-          final result = dataTv.searchResult;
+        } else if (state is TvSearchLoaded) {
+          final result = state.tvs;
           return Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
               itemBuilder: (context, index) {
-                final tv = dataTv.searchResult[index];
+                final tv = result[index];
                 return TvCard(tv);
               },
               itemCount: result.length,
@@ -89,7 +81,11 @@ class TvConsumer extends StatelessWidget {
           );
         } else {
           return Expanded(
-            child: Container(),
+            child: Container(
+              child: Center(
+                child: Text(state.message),
+              ),
+            ),
           );
         }
       },
